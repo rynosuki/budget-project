@@ -3,7 +3,7 @@ import databases
 import datetime
 
 class UI():
-  vers = "0.03"
+  vers = "1.0"
   db = databases.createDatabase()
 
   def mainMenu(self):
@@ -66,7 +66,7 @@ class UI():
 
     self.headerText()
     print("Add Expense:\n")
-    i_source = input("Expense source: ")
+    i_source = input("Expense source (store): ")
 
     self.headerText()
     print("Add Expense:\n")
@@ -118,7 +118,7 @@ class UI():
   def showTables(self):
     self.headerText()
 
-    i_table = input("Which table do you want to view? (income, expenses, items): ")
+    i_table = input("Which table do you want to view? (income, expenses): ")
     self.headerText()
 
     i_month = input("Which month of the year? (1-12): ")
@@ -149,11 +149,11 @@ class UI():
 
   def runQuery(self):
     self.headerText()
-    print("\n1. Get a overlook of all expense types and the combined price of a given month")
+    print("\n1. Get a overlook of all expense types and the combined expense of a given month")
     print("2. Most expensive item during a month")
     print("3. Get details from receipt")
-    print("4. Income - Expenses yearly")
-    print("5. Money spent per type")
+    print("4. Income - Expenses monthly over the year")
+    print("5. Amount spent on a specified product in the different stores")
     print("6. Quit")
 
     value = input("\nChoose menu type: ")
@@ -168,14 +168,14 @@ class UI():
             year = str(now.year)
         else:
             year = year
-        print("Name\tPrice")
+        print("Name", end = " " * 16)
+        print("Price", end = " " * 15)
+        print()
         data = self.db.queryHandler(choice = 1, month = month, year = year)
-        for i in data:
-            for j in i: print(j, end = "\t")
-            print("")
+        self.printValues(data)
         value = input("\nReturn to main menu? Y/N ")
         if value.lower() == "y":
-            self.mainMenu()
+            self.runQuery()
         else:
             self.quitMenu()
     elif value == "2":
@@ -187,56 +187,65 @@ class UI():
         else:
             year = year
         data = self.db.queryHandler(choice = 2, year = year) 
-        print("Month\tType")
-        for i in data:
-            for j in i: print(j, end = "\t")
+        print("Month", end = " " * 15)
+        print("Year", end = " " * 16)
+        print("Price", end = " " * 15)
+        print()
+        self.printValues(data)
         value = input("\nReturn to main menu? Y/N ")
         if value.lower() == "y":
-            self.mainMenu()
+            self.runQuery()
         else:
             self.quitMenu() 
     elif value == "3":
         self.headerText()
         data = self.db.showExpenses()
-        print("\nID\tAmount\tDate")
-        for i in data: 
-            for j in i: print(j, end = "\t")
-            print("")
+        print("\nID", end = " " * 18)
+        print("Amount", end = " " * 14)
+        print("Date", end = " " * 16)
+        print()
+        self.printValues(data)
         print("")
         value = input("Choose an ID to view receipt: ")
         self.headerText()
         data = self.db.queryHandler(choice = 3, expenseid = value)
-        print("\nIncome\t\tExpenses\tPrice")
-        for i in data:
-            for j in i: print(j, end = "\t\t")
-            print("")
+        print("\nName", end = " " * 16)
+        print("Amount", end = " " * 14)
+        print("Price", end = " " * 15)
+        print()
+        self.printValues(data)
         value = input("\nReturn to main menu? Y/N ")
         if value.lower() == "y":
-            self.mainMenu()
+            self.runQuery()
         else:
             self.quitMenu()
     elif value == "4":
         self.headerText()
-        data = self.db.queryHandler(choice = 4)
-        print("\nIncome\tExpense\tProfit")
-        for i in data:
-            for j in i: print(j, end="\t")
-            print("")
+        year = input("Which year do wish to view? ")
+        data = self.db.queryHandler(choice = 4, year = year)
+        print("\nMonth", end=" " * 15)
+        print("Income", end=" " * 14)
+        print("Expense", end=" " * 13)        
+        print("Profit", end=" " * 14)
+        print()
+        self.printValues(data)
         value = input("\nReturn to main menu? Y/N ")
         if value.lower() == "y":
-            self.mainMenu()
+            self.runQuery()
         else:
             self.quitMenu()
     elif value == "5":
         self.headerText()
-        month = input("Which month would you like to see? (1-12) ")
-        data = self.db.queryHandler(choice = 5, month = month)
-        for i in data:
-            for j in i: print(j,end="\t")
-            print("")
+        name = input("Which product do you wish to see? ")
+        data = self.db.queryHandler(choice = 5, name = name)
+        print("\nSource", end = " " * 14)
+        print("Sum", end = " " * 17)
+        print("Name", end = " " * 16)
+        print()
+        self.printValues(data)
         value = input("\nReturn to main menu? Y/N ")
         if value.lower() == "y":
-            self.mainMenu()
+            self.runQuery()
         else:
             self.quitMenu()
     elif value == "6":
@@ -259,3 +268,8 @@ class UI():
           print("Amount\tName\tSource\tNote")
       elif table == "items":
           print("Name\tPrice\tQuantity\tType")
+
+  def printValues(self, values):
+    for i in values:
+        for j in i: print(j, end=" " * (20-len(str(j))))
+        print("")

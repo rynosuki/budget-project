@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="">
+  <head><title>Add Income</title>
+    <body>
+      <form method="post" action="/add_movie_form_submission/">
+        {% csrf_token %}
+        <input name="income_amount" placeholder="Amount">
+        <br>
+        <input name="income_source" placeholder="Source">
+        <br>
+        <input name="income_contributor" placeholder="Contributor">
+        <br>
+        <button>Add</button>
+      </form>
+    </body>
+  </head>
+</html>
